@@ -1,20 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db, googleProvider } from "../firebaseConfig";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, db } from "../firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
 const SignupPage = () => {
+  const [companyName, setCompanyName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("buyer"); // Default role: buyer
   const navigate = useNavigate();
 
   // ✅ Handle Email/Password Signup
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (!email || !password || !role) {
+
+    // ✅ Validation checks
+    if (!companyName || !firstName || !lastName || !email || !password || !confirmPassword) {
       alert("All fields are required!");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
       return;
     }
 
@@ -23,40 +33,25 @@ const SignupPage = () => {
       const user = userCredential.user;
       console.log("User signed up:", user);
 
-      // ✅ Store user details in Firestore (buyers or sellers collection)
+      // ✅ Store user details in Firestore
       const userRef = doc(db, role === "buyer" ? "buyers" : "sellers", user.uid);
       await setDoc(userRef, {
+        companyName,
+        firstName,
+        lastName,
         email: user.email,
         role: role,
         createdAt: new Date(),
       });
 
-      alert("Signup successful! Redirecting to login...");
-      navigate("/login"); // ✅ Redirect to login page after signup
+      // ✅ Redirect based on user role
+      if (role === "buyer") {
+        navigate("/BuyerDashboard");
+      } else {
+        navigate("/SellerDashboard");
+      }
     } catch (error) {
       console.error("Signup error:", error.message);
-      alert(error.message);
-    }
-  };
-
-  // ✅ Handle Google Signup
-  const handleGoogleSignup = async () => {
-    try {
-      const userCredential = await signInWithPopup(auth, googleProvider);
-      const user = userCredential.user;
-
-      // ✅ Store user details in Firestore if first-time login
-      const userRef = doc(db, role === "buyer" ? "buyers" : "sellers", user.uid);
-      await setDoc(userRef, {
-        email: user.email,
-        role: role,
-        createdAt: new Date(),
-      });
-
-      alert("Signup successful with Google! Redirecting to login...");
-      navigate("/login"); // ✅ Redirect to login page after signup
-    } catch (error) {
-      console.error("Google Signup Error:", error.message);
       alert(error.message);
     }
   };
@@ -74,9 +69,10 @@ const SignupPage = () => {
       </header>
 
       {/* Signup Form */}
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md mt-24">
         <h2 className="text-2xl font-bold text-center mb-4">Create an Account</h2>
         <form onSubmit={handleSignup} className="flex flex-col">
+          {/* Role Selection */}
           <div className="flex justify-center mb-4">
             <button
               type="button"
@@ -93,6 +89,32 @@ const SignupPage = () => {
               Seller
             </button>
           </div>
+
+          {/* Input Fields */}
+          <input
+            type="text"
+            placeholder="Company Name"
+            className="border p-2 rounded mb-3"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="First Name"
+            className="border p-2 rounded mb-3"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            className="border p-2 rounded mb-3"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
           <input
             type="email"
             placeholder="Email"
@@ -109,27 +131,27 @@ const SignupPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            className="border p-2 rounded mb-3"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+
           <button type="submit" className="bg-green-600 text-white p-2 rounded hover:bg-green-700">
             Sign Up
           </button>
         </form>
-
-        <div className="text-center mt-4">
-          <p>OR</p>
-          <button
-            onClick={handleGoogleSignup}
-            className="bg-blue-600 text-white p-2 rounded flex items-center justify-center mt-2 w-full"
-          >
-            <img src="/google-icon.png" alt="Google Icon" className="h-5 w-5 mr-2" />
-            Sign Up with Google
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
 export default SignupPage;
+
+
 
 
 
