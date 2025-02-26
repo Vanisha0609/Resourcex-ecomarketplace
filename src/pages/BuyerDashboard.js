@@ -91,16 +91,16 @@ const BuyerDashboard = () => {
 
   // Add to Cart function
   const addToCart = (product, quantity) => {
-    alert(`Added ${quantity} ${product.name}(s) to cart!`);
+    alert(Added ${quantity} ${product.name}(s) to cart!);
   };
 
   // Add to Wishlist function
   const addToWishlist = (product) => {
     if (!wishlist.some((item) => item.id === product.id)) {
       setWishlist([...wishlist, product]);
-      alert(`Added ${product.name} to wishlist!`);
+      alert(Added ${product.name} to wishlist!);
     } else {
-      alert(`${product.name} is already in your wishlist!`);
+      alert(${product.name} is already in your wishlist!);
     }
   };
 
@@ -224,7 +224,7 @@ const BuyerDashboard = () => {
 
                     {/* Product Image */}
                     <img
-                      src={product.image} // Ensure your product data includes an `image` field
+                      src={product.image} // Ensure your product data includes an image field
                       alt={product.name}
                       className="w-full h-48 object-cover rounded-lg mb-4"
                     />
@@ -306,7 +306,7 @@ const BuyerDashboard = () => {
 
               {/* Product Image in Modal */}
               <img
-                src={selectedProduct.image} // Ensure your product data includes an `image` field
+                src={selectedProduct.image} // Ensure your product data includes an image field
                 alt={selectedProduct.name}
                 className="w-full h-48 object-cover rounded-lg mb-4"
               />

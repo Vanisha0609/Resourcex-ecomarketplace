@@ -185,7 +185,7 @@ const LandingPage = () => {
       <footer className="w-full bg-green-900 text-white text-center py-6">
         <p className="text-lg">
           &copy; 2025 ResourceX. All rights reserved.{" "}
-          <span className="text-green-400">♻️ Recycle. Reuse. Renew.</span>
+          <span className="text-green-400">♻ Recycle. Reuse. Renew.</span>
         </p>
       </footer>
     </div>
