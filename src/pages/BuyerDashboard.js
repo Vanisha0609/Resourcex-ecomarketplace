@@ -91,16 +91,16 @@ const BuyerDashboard = () => {
 
   // Add to Cart function
   const addToCart = (product, quantity) => {
-    alert(Added ${quantity} ${product.name}(s) to cart!);
+    alert(`Added ${quantity} ${product.name}(s) to cart!`);
   };
 
   // Add to Wishlist function
   const addToWishlist = (product) => {
     if (!wishlist.some((item) => item.id === product.id)) {
       setWishlist([...wishlist, product]);
-      alert(Added ${product.name} to wishlist!);
+      alert(`Added ${product.name} to wishlist!`);
     } else {
-      alert(${product.name} is already in your wishlist!);
+      alert(`${product.name} is already in your wishlist!`);
     }
   };
 
