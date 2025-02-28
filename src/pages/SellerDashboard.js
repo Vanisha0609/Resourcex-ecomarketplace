@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { impactdata } from "../impactdata";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,10 @@ import { auth, db, storage } from "../firebaseConfig";
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { signOut } from "firebase/auth";
+import SalesChart from "../components/SalesChart";
+// import SellerChatbot from "../components/SellerChatbot";
+import { LayoutDashboard, ShoppingBag, PackagePlus, LogOut } from "lucide-react";
+import Confetti from "react-confetti"; // Import Confetti
 
 const SellerDashboard = () => {
   const [selectedOption, setSelectedOption] = useState("dashboard");
@@ -16,6 +19,7 @@ const SellerDashboard = () => {
   const [price, setPrice] = useState("");
   const [image, setImage] = useState(null);
   const [popupMessage, setPopupMessage] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false); // State for confetti
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -75,9 +79,13 @@ const SellerDashboard = () => {
       // Refresh the product list
       fetchProducts();
 
-      // Show popup message
+      // Show confetti and popup message
+      setShowConfetti(true); // Trigger confetti
       setPopupMessage("Product added successfully!");
-      setTimeout(() => setPopupMessage(""), 3000);
+      setTimeout(() => {
+        setShowConfetti(false); // Hide confetti after 5 seconds
+        setPopupMessage("");
+      }, 5000);
 
       // Reset form
       setProductName("");
@@ -126,72 +134,184 @@ const SellerDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      <div className="w-64 bg-gray-800 text-white flex flex-col p-5">
-        <h2 className="text-xl font-bold mb-5">Seller Dashboard</h2>
-        <button className={`p-3 rounded flex items-center ${selectedOption === "dashboard" ? "bg-gray-700" : ""}`} onClick={() => setSelectedOption("dashboard")}>
-          <img src="/dashlogo.png" alt="Dashboard Logo" className="w-6 h-6 mr-2 bg-transparent" />
-          Dashboard
-        </button>
-        <button className={`p-3 rounded flex items-center ${selectedOption === "addProduct" ? "bg-gray-700" : ""}`} onClick={() => setSelectedOption("addProduct")}>
-          <img src="/prodlogo.png" alt="Add products" className="w-6 h-6 mr-2 bg-transparent" />
-          Add Products
-        </button>
-        <button className="p-3 rounded mt-auto bg-red-600 hover:bg-red-700" onClick={handleLogout}>
-          Sign Out
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
+      {/* Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth} // Cover full width
+          height={window.innerHeight} // Cover full height
+          recycle={false} // Stop confetti after animation
+        />
+      )}
+
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-green-600 to-green-800 text-white py-5 px-6 rounded-lg shadow-lg mb-8">
+        <h1 className="text-4xl font-bold text-center mb-4">Seller Dashboard</h1>
+        <p className="text-lg text-center max-w-2xl mx-auto">
+          Manage your products and track your sales with ease.
+        </p>
       </div>
 
-      <div className="flex-1 p-5">
-        {popupMessage && <div className="bg-green-500 text-white p-3 mb-3 text-center rounded">{popupMessage}</div>}
+      <div className="flex min-h-[calc(100vh-200px)]"> {/* Ensure full height */}
+        {/* Sidebar */}
+        <div className="w-64 bg-green-800 text-white flex flex-col p-5 rounded-lg shadow-lg mr-6">
+          <h2 className="text-xl font-bold mb-5">Menu</h2>
 
-        {selectedOption === "dashboard" && (
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Your Products</h2>
-            {products.length > 0 ? (
-              <ul>
-                {products.map((product) => (
-                  <li key={product.id} className="border p-3 mb-2 flex gap-4 items-center">
-                    <img src={product.imageUrl} alt={product.name} className="w-20 h-20 object-cover rounded" />
-                    <div className="flex-1">
-                      <strong>{product.name}</strong> - ${product.price}
-                      <p className="text-gray-600">{product.description}</p>
-                    </div>
-                    <button 
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                      onClick={() => handleDeleteProduct(product.id, product.imageUrl)}
-                    >
-                      Delete
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No products added yet.</p>
-            )}
-          </div>
-        )}
+          <button
+            className={`p-3 rounded flex items-center ${
+              selectedOption === "dashboard" ? "bg-green-700" : "hover:bg-green-700"
+            }`}
+            onClick={() => setSelectedOption("dashboard")}
+          >
+            <LayoutDashboard className="w-6 h-6 mr-2" /> Dashboard
+          </button>
 
-        {selectedOption === "addProduct" && (
-          <div>
-            <h2 className="text-2xl font-bold">Add a New Product</h2>
-            <form onSubmit={handleAddProduct} className="flex flex-col gap-3 mt-4">
-              <input type="text" placeholder="Product Name" value={productName} onChange={(e) => setProductName(e.target.value)} className="border p-2 rounded" required />
-              <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} className="border p-2 rounded" required></textarea>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded">
-                {["Metal and Alloy", "Chemical and Petrochemical", "Construction & Demolition", "Agricultural & Food Processing", "Textile & Leather", "Paper & Pulp", "Plastic & Polymer", "Electronic Waste & E-Scrap", "Pharmaceutical & Biochemical", "Glass & Ceramics"].map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-              <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} className="border p-2 rounded" required />
-              <input type="file" id="imageInput" onChange={(e) => setImage(e.target.files[0])} className="border p-2 rounded" required />
-              <button type="submit" className="bg-green-600 text-white p-2 rounded hover:bg-green-700">Add Product</button>
-            </form>
-          </div>
-        )}
+          <button
+            className={`p-3 rounded flex items-center ${
+              selectedOption === "addProduct" ? "bg-green-700" : "hover:bg-green-700"
+            }`}
+            onClick={() => setSelectedOption("addProduct")}
+          >
+            <PackagePlus className="w-6 h-6 mr-2" /> Add Products
+          </button>
+
+          <button
+            className={`p-3 rounded flex items-center ${
+              selectedOption === "yourProducts" ? "bg-green-700" : "hover:bg-green-700"
+            }`}
+            onClick={() => setSelectedOption("yourProducts")}
+          >
+            <ShoppingBag className="w-6 h-6 mr-2" /> Your Products
+          </button>
+
+          {/* <button
+            className="p-3 rounded flex items-center bg-blue-600 hover:bg-blue-700 mt-4"
+            onClick={() => setSelectedOption("chatbot")}
+          >
+            <MessageSquare className="w-6 h-6 mr-2" /> Seller Support
+          </button> */}
+
+          <button
+            className="p-3 rounded mt-auto bg-red-600 hover:bg-red-700 flex items-center"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-6 h-6 mr-2" /> Sign Out
+          </button>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 bg-white p-6 rounded-lg shadow-lg">
+          {selectedOption === "dashboard" && (
+            <div>
+              <h2 className="text-3xl font-bold mb-6 text-green-800">📊 Sales Analytics</h2>
+
+              {/* Dashboard Statistics */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="p-4 bg-green-50 rounded-xl shadow-lg">
+                  <h2 className="text-lg font-semibold mb-2">💰 Total Earnings</h2>
+                  <p className="text-2xl font-bold text-green-600">₹12,340</p>
+                </div>
+
+                <div className="p-4 bg-green-50 rounded-xl shadow-lg">
+                  <h2 className="text-lg font-semibold mb-2">📦 Total Orders</h2>
+                  <p className="text-2xl font-bold text-blue-600">275</p>
+                </div>
+
+                <div className="p-4 bg-green-50 rounded-xl shadow-lg">
+                  <h2 className="text-lg font-semibold mb-2">🛒 Products Sold</h2>
+                  <p className="text-2xl font-bold text-purple-600">135</p>
+                </div>
+              </div>
+
+              {/* Sales Analytics Chart */}
+              <div className="mt-6">
+                <SalesChart />
+              </div>
+            </div>
+          )}
+
+          {/* {selectedOption === "chatbot" && <SellerChatbot />} */}
+
+          {selectedOption === "yourProducts" && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4 text-green-800">Your Products</h2>
+              {products.length > 0 ? (
+                <ul>
+                  {products.map((product) => (
+                    <li key={product.id} className="border p-3 mb-2 flex gap-4 items-center">
+                      <img src={product.imageUrl} alt={product.name} className="w-20 h-20 object-cover rounded" />
+                      <div className="flex-1">
+                        <strong>{product.name}</strong> - ${product.price}
+                        <p className="text-gray-600">{product.description}</p>
+                      </div>
+                      <button
+                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                        onClick={() => handleDeleteProduct(product.id, product.imageUrl)}
+                      >
+                        Delete
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No products added yet.</p>
+              )}
+            </div>
+          )}
+
+          {selectedOption === "addProduct" && (
+            <div>
+              <h2 className="text-2xl font-bold text-green-800">Add a New Product</h2>
+              <form onSubmit={handleAddProduct} className="flex flex-col gap-3 mt-4">
+                <input
+                  type="text"
+                  placeholder="Product Name"
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                  className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+                <textarea
+                  placeholder="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+                <input
+                  type="number"
+                  placeholder="Price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+                <input
+                  type="file"
+                  id="imageInput"
+                  onChange={(e) => setImage(e.target.files[0])}
+                  className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700"
+                >
+                  Add Product
+                </button>
+              </form>
+            </div>
+          )}
+
+          {popupMessage && (
+            <div className="bg-green-500 text-white p-3 mb-3 text-center rounded-lg">
+              {popupMessage}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-export default SellerDashboard;
+export default SellerDashboard; // Ensure this is at the top level
