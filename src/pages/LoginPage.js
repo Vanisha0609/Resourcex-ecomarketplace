@@ -8,61 +8,74 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState(""); // Stores the role after verification
 
-  // Function to check user role in Firestore
-  useEffect(() => {
-    const checkUserRoleAndRedirect = async (user) => {
-      if (!user) return; // Exit if no user is logged in
+  // Function to check Firestore for user existence
+  const checkUserInFirestore = async (user) => {
+    if (!user) return false;
 
-      try {
-        const buyerRef = doc(db, "buyers", user.uid);
-        const buyerSnap = await getDoc(buyerRef);
-        if (buyerSnap.exists()) {
-          navigate("/BuyerDashboard");
-          return;
-        }
-
-        const sellerRef = doc(db, "sellers", user.uid);
-        const sellerSnap = await getDoc(sellerRef);
-        if (sellerSnap.exists()) {
-          navigate("/SellerDashboard");
-          return;
-        }
-
-        alert("Your role is not set. Please sign up again.");
-        auth.signOut();
-        navigate("/signup");
-      } catch (error) {
-        console.error("Error checking user role:", error.message);
+    try {
+      const buyerRef = doc(db, "buyers", user.uid);
+      const buyerSnap = await getDoc(buyerRef);
+      if (buyerSnap.exists()) {
+        setRole("buyer");
+        return true;
       }
-    };
 
-    // Listen for authentication state change
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        checkUserRoleAndRedirect(user);
+      const sellerRef = doc(db, "sellers", user.uid);
+      const sellerSnap = await getDoc(sellerRef);
+      if (sellerSnap.exists()) {
+        setRole("seller");
+        return true;
       }
-    });
 
-    return () => unsubscribe(); // Cleanup on unmount
-  }, [navigate]);
+      return false; // User not found in Firestore
+    } catch (error) {
+      console.error("Error checking user in Firestore:", error.message);
+      return false;
+    }
+  };
 
   // Handle Email/Password Login
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userExists = await checkUserInFirestore(user);
+      if (!userExists) {
+        alert("Your account details are not found. Please register first.");
+        auth.signOut();
+        return;
+      }
+
+      // Redirect based on role
+      if (role === "buyer") navigate("/BuyerDashboard");
+      if (role === "seller") navigate("/SellerDashboard");
     } catch (error) {
-      alert(error.message);
+      alert("Login failed. Please check your credentials.");
     }
   };
 
   // Handle Google Login
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const userCredential = await signInWithPopup(auth, googleProvider);
+      const user = userCredential.user;
+
+      const userExists = await checkUserInFirestore(user);
+      if (!userExists) {
+        alert("Your account details are not found. Please register first.");
+        auth.signOut();
+        return;
+      }
+
+      // Redirect based on role
+      if (role === "buyer") navigate("/BuyerDashboard");
+      if (role === "seller") navigate("/SellerDashboard");
     } catch (error) {
-      alert(error.message);
+      alert("Google Sign-In failed. Please try again.");
     }
   };
 
@@ -87,7 +100,7 @@ const LoginPage = () => {
         </div>
       </header>
 
-      {/* Login Form - Matching Signup Page Size */}
+      {/* Login Form */}
       <div className="bg-white p-10 rounded-lg shadow-lg mt-24 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <form onSubmit={handleLogin} className="flex flex-col">

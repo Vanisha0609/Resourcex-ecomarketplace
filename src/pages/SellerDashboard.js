@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { impactdata } from "../impactdata";
 import { useNavigate } from "react-router-dom";
 import { auth, db, storage } from "../firebaseConfig";
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
@@ -34,6 +35,7 @@ const SellerDashboard = () => {
       console.error("Error fetching products:", error);
     }
   };
+  
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -53,7 +55,7 @@ const SellerDashboard = () => {
       const imageRef = ref(storage, `products/${user.uid}/${image.name}`);
       await uploadBytes(imageRef, image);
       const imageUrl = await getDownloadURL(imageRef);
-
+      const impact = impactdata[category] || { co2Saved: 0, wasteDiverted: 0, energySaved: 0};
       // Add product to Firestore
       await addDoc(collection(db, "products"), {
         sellerId: user.uid,
@@ -61,9 +63,14 @@ const SellerDashboard = () => {
         description,
         category,
         price: parseFloat(price),
+        co2Saved: impact.co2Saved,
+        wasteDiverted: impact.wasteDiverted,
+        energySaved: impact.energySaved,
         imageUrl,
         createdAt: new Date(),
       });
+
+      
 
       // Refresh the product list
       fetchProducts();
