@@ -258,11 +258,11 @@ const SellerDashboard = () => {
               )}
             </div>
           )}
-
           {selectedOption === "addProduct" && (
-            <div>
+            <div className="h-full flex flex-col">
               <h2 className="text-2xl font-bold text-green-800">Add a New Product</h2>
-              <form onSubmit={handleAddProduct} className="flex flex-col gap-3 mt-4">
+              <form onSubmit={handleAddProduct} className="flex flex-col gap-3 mt-4 flex-1">
+                {/* Product Name Input */}
                 <input
                   type="text"
                   placeholder="Product Name"
@@ -271,6 +271,8 @@ const SellerDashboard = () => {
                   className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
+
+                {/* Description Textarea */}
                 <textarea
                   placeholder="Description"
                   value={description}
@@ -278,6 +280,27 @@ const SellerDashboard = () => {
                   className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
+
+                {/* Category Dropdown */}
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  required
+                >
+                  <option value="" disabled>Select Category</option>
+                  <option value="Chemical and Petrochemical">Chemical and Petrochemical</option>
+                  <option value="Metal and Alloy">Metal and Alloy</option>
+                  <option value="Textile & Leather">Textile & Leather</option>
+                  <option value="Paper & Pulp">Paper & Pulp</option>
+                  <option value="Construction & Demolition">Construction & Demolition</option>
+                  <option value="Agricultural & Food Processing">Agricultural & Food Processing</option>
+                  <option value="Metal">Metal</option>
+                  <option value="Plastic & Polymer">Plastic & Polymer</option>
+                  <option value="Glass & Ceramics">Glass & Ceramics</option>
+                </select>
+
+                {/* Price Input */}
                 <input
                   type="number"
                   placeholder="Price"
@@ -286,6 +309,8 @@ const SellerDashboard = () => {
                   className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
+
+                {/* Image Upload Input */}
                 <input
                   type="file"
                   id="imageInput"
@@ -293,6 +318,8 @@ const SellerDashboard = () => {
                   className="border p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   required
                 />
+
+                {/* Submit Button */}
                 <button
                   type="submit"
                   className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700"
