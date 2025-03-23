@@ -48,5 +48,13 @@ Charts: Custom Sales Chart Component
 ![Screenshot 2025-03-23 154520](https://github.com/user-attachments/assets/49da75c4-40af-49e1-9754-e80616b92a38)
 ![Screenshot 2025-03-23 154535](https://github.com/user-attachments/assets/5730a64e-33ce-4c65-8597-14d3336de4ea)
 
+## Firebase Integration:
 
+Firestore: Used to store and manage product data, seller information, and sales statistics.
+
+Firebase Storage: Handles image uploads for product listings.
+
+Firebase Authentication: Manages user authentication and role-based access for sellers.
+
+Real-time updates ensure seamless data synchronization across the platform.
 
