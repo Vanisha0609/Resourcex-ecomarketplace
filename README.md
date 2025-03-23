@@ -1,26 +1,34 @@
 # ReSourceX
 
-ResourceX - Circular Economy Marketplace
-ResourceX is a circular economy marketplace where businesses can buy and sell industrial by-products efficiently, reducing waste and promoting sustainability. This platform enables users to discover, filter, and purchase products while contributing to a greener future.
+The Sustainable Marketplace Platform (ResourceX) is an e-commerce platform designed to connect buyers and sellers in a way that promotes sustainability and waste reduction. Sellers from industries can list their byproducts for sale, ensuring these materials are reused rather than wasted. Buyers can purchase these byproducts and track their environmental impact through a personalized dashboard.
 
 ## Features
-Product Listings: View a wide range of industrial by-products with details like name, category, price, and quantity.
+### Product Management:
 
-Search and Filters: Search for products by name, filter by category, price range, and sort by latest, high-to-low, or low-to-high prices.
+Add new products with details like name, description, category, price, and image.
+View and delete existing products.
 
-Wishlist: Add products to your wishlist for future reference.
+### Sales Analytics:
 
-Add to Cart: Add products to your cart with a specified quantity.
+Track total earnings, orders, and products sold.
+Visualize sales trends with interactive charts.
 
-Real-Time Updates: Products are fetched in real-time from Firebase Firestore.
+### Sustainability Impact:
 
-Responsive Design: The platform is fully responsive and works seamlessly on all devices.
+Each product listing includes environmental impact metrics (e.g., CO2 saved, waste diverted, energy saved).
+Sellers can see the cumulative impact of their sales.
+
+### User-Friendly Interface:
+
+Built with React and Tailwind CSS for a responsive and modern design.
+Intuitive navigation with a sidebar menu.
+
+### Authentication:
+Secure login and logout functionality using Firebase Authentication.
 
 ## Technologies Used
 Frontend: React, Tailwind CSS
 
-Backend: Firebase Firestore
+Backend: Firebase (Firestore, Storage, Authentication)
 
-Icons: React Icons (react-icons)
-
-Routing: React Router (react-router-dom)
+Charts: Custom Sales Chart Component
