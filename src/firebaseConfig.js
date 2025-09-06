@@ -6,7 +6,7 @@ import { updateDoc } from "firebase/firestore";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDWkNNbq1k6UMjcQr_qIp7n4sAkuhgODK8",
+  apiKey: "********",
   authDomain: "regen-market.firebaseapp.com",
   projectId: "regen-market",
   storageBucket: "regen-market.firebasestorage.app",
